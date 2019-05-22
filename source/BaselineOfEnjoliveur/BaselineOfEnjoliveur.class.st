@@ -19,5 +19,7 @@ BaselineOfEnjoliveur >> baseline: spec [
 		for: #common
 		do: [
 			spec
-				package: 'RB-Spec']
+				package: 'RB-Spec';
+				package: 'RB-Spec-Tests';
+				package: 'RB-Spec-Extensions']
 ]
