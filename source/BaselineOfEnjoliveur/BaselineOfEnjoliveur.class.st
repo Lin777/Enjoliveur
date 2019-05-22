@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #baselines }
-BaselineOfEnjoliveur class >> baseline: spec [
+BaselineOfEnjoliveur >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
