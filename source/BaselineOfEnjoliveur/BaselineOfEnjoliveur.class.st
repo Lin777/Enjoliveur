@@ -12,15 +12,3 @@ BaselineOfEnjoliveur class >> baseline: spec [
 		do: [ spec package: 'RB-Spec';
 			package: 'RB-Spec-Tests']
 ]
-
-{ #category : #baselines }
-BaselineOfEnjoliveur >> baseline: spec [
-	<baseline>
-	spec
-		for: #common
-		do: [
-			spec
-				package: 'RB-Spec';
-				package: 'RB-Spec-Tests';
-				package: 'RB-Spec-Extensions']
-]
