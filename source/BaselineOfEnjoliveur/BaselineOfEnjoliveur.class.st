@@ -9,7 +9,8 @@ BaselineOfEnjoliveur class >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ spec package: 'Refactoring-Updates']
+		do: [ spec package: 'RB-Spec';
+			package: 'RB-Spec-Tests']
 ]
 
 { #category : #baselines }
