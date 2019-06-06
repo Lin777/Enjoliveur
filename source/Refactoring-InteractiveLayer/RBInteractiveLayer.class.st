@@ -32,7 +32,6 @@ RBInteractiveLayer >> compiledMethodOf: aMethod from: aClass [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> executeRefactoring: refactoring [
-	"NautilusRefactoring new refactoringOptions: refactoring."
 	[ refactoring execute ] on: RBRefactoringError do: [ :e | 
 	UIManager default alert: e messageText ].
 ]
@@ -58,6 +57,66 @@ RBInteractiveLayer >> extractMethod [
 RBInteractiveLayer >> extractMethodIn: aMethod withClass: aClass for: anInterval [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
 	self extractMethod.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractMethodIn: aMethod withClass: aClass for: anInterval withName: aString [
+	self initializeMethod: aMethod class: aClass interval: anInterval .
+	self extractMethodWithName: aString.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractMethodWithName: aString [
+	| refactoring selectedInterval |
+	selectedInterval := interval ifEmpty: [ node sourceInterval ].
+	
+	refactoring := RBExtractMethodRefactoring	
+		extract: selectedInterval from: method selector in: method origin.
+	self setUpOptionToUseExistingMethodDuring: refactoring.
+	self setUpOptionToOverrideExistingMethodDuring: refactoring.
+	refactoring setOption: #methodName toUse: aString.
+	
+	self executeRefactoring: refactoring.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractTemp [
+	| refactoring tempName|
+	tempName := UIManager default 
+		request: 'New temp name' 
+		initialAnswer: ''
+		title: 'Extract code to temp variable'.
+	refactoring := RBExtractToTemporaryRefactoring	
+		extract: node sourceInterval
+		to: tempName
+		from: method selector
+		in: method origin.
+	
+	self executeRefactoring: refactoring.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractTempIn: aMethod withClass: aClass for: anInterval [
+	self initializeMethod: aMethod class: aClass interval: anInterval .
+	self extractTemp.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractTempIn: aMethod withClass: aClass for: anInterval withTempName: tempName [
+	self initializeMethod: aMethod class: aClass interval: anInterval .
+	self extractTempWithName: tempName.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractTempWithName: tempName [
+	| refactoring |
+	refactoring := RBExtractToTemporaryRefactoring	
+		extract: node sourceInterval
+		to: tempName
+		from: method selector
+		in: method origin.
+	
+	self executeRefactoring: refactoring.
 ]
 
 { #category : #'as yet unclassified' }
@@ -132,6 +191,41 @@ RBInteractiveLayer >> node [
 { #category : #accessing }
 RBInteractiveLayer >> node: anObject [
 	node := anObject
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> pushUpMethod [
+	| refactoring |
+	refactoring := RBPullUpMethodRefactoring 
+		pullUp: {method selector} 
+		from: method origin.
+
+	self executeRefactoring: refactoring.
+	
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> pushUpMethod: aMethod inClass: aClass [
+	self initializeMethod: aMethod class: aClass interval: nil .
+	self pushUpMethod.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> renameTempIn: aMethod withClass: aClass for: anInterval withName: aString [
+	self initializeMethod: aMethod class: aClass interval: anInterval .
+	self renameTempWithName: aString.
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> renameTempWithName: aString [
+	| refactoring |
+	refactoring := RBRenameTemporaryRefactoring	
+		renameTemporaryFrom: node sourceInterval
+		to: aString
+		in: method origin
+		selector: method selector.
+	
+	self executeRefactoring: refactoring.
 ]
 
 { #category : #'as yet unclassified' }
