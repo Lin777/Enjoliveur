@@ -9,7 +9,19 @@ BaselineOfEnjoliveur >> baseline: spec [
 	<baseline>
 	spec
 		for: #common
-		do: [ spec package: 'RB-Spec';
+		do: [ 
+			self setUpDependencies: spec.
+			spec package: 'RB-Spec';
 			package: 'RB-Spec-Tests';
-			package: 'Refactoring-InteractiveLayer']
+			package: 'Refactoring-InteractiveLayer' with: [ spec requires: 'SystemCommands' ]]
+]
+
+{ #category : #baselines }
+BaselineOfEnjoliveur >> setUpDependencies: spec [
+	spec	
+		baseline: 'SystemCommands'	
+		with: [ spec	
+				repository: 
+				'github://Lin777/SystemCommands:ChangeRefactorCommands/repository' ].
+
 ]
