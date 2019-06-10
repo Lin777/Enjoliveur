@@ -69,7 +69,7 @@ RBInteractiveLayer >> executeRefactoring: refactoring [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractMethod [
-	| refactoring dialog selectedInterval |
+	| refactoring selectedInterval dialog|
 	selectedInterval := interval ifEmpty: [ node sourceInterval ].
 	
 	refactoring := RBExtractMethodRefactoring	
@@ -80,14 +80,13 @@ RBInteractiveLayer >> extractMethod [
 		dialog := SycMethodNameEditor openOn: methodName.
 		dialog cancelled ifTrue: [  CmdCommandAborted signal ].
 		methodName].
-	
-	self executeRefactoring: refactoring.
+	^ refactoring
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractMethodIn: aMethod withClass: aClass for: anInterval [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self extractMethod.
+	self executeRefactoring: (self extractMethod)
 ]
 
 { #category : #'as yet unclassified' }
@@ -115,6 +114,16 @@ RBInteractiveLayer >> extractMethodWithName: aString withPerform: aSymbol [
 	| refactoring |
 	
 	refactoring := self extractMethodWithName: aString.
+	
+	[refactoring perform: aSymbol.
+	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> extractMethodWithPerform: aSymbol [
+	| refactoring |
+	
+	refactoring := self extractMethod.
 	
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
