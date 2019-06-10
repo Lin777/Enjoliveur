@@ -93,7 +93,7 @@ RBInteractiveLayer >> extractMethodIn: aMethod withClass: aClass for: anInterval
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractMethodIn: aMethod withClass: aClass for: anInterval withName: aString [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self extractMethodWithName: aString.
+	self executeRefactoring: (self extractMethodWithName: aString).
 ]
 
 { #category : #'as yet unclassified' }
@@ -107,21 +107,15 @@ RBInteractiveLayer >> extractMethodWithName: aString [
 	self setUpOptionToOverrideExistingMethodDuring: refactoring.
 	refactoring setOption: #methodName toUse: aString.
 	
-	self executeRefactoring: refactoring.
+	^ refactoring
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractMethodWithName: aString withPerform: aSymbol [
-	| refactoring selectedInterval |
-	selectedInterval := interval ifEmpty: [ node sourceInterval ].
+	| refactoring |
 	
-	refactoring := RBExtractMethodRefactoring	
-		extract: selectedInterval from: method selector in: method origin.
-	self setUpOptionToUseExistingMethodDuring: refactoring.
-	self setUpOptionToOverrideExistingMethodDuring: refactoring.
-	refactoring setOption: #methodName toUse: aString.
+	refactoring := self extractMethodWithName: aString.
 	
-	"self executeRefactoring: refactoring."
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
 ]
@@ -129,31 +123,23 @@ RBInteractiveLayer >> extractMethodWithName: aString withPerform: aSymbol [
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractTempIn: aMethod withClass: aClass for: anInterval withTempName: tempName [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self extractTempWithName: tempName.
+	self executeRefactoring: (self extractTempWithName: tempName)
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractTempWithName: tempName [
-	| refactoring |
-	refactoring := RBExtractToTemporaryRefactoring	
+	^ RBExtractToTemporaryRefactoring	
 		extract: node sourceInterval
 		to: tempName
 		from: method selector
-		in: method origin.
-	
-	self executeRefactoring: refactoring.
+		in: method origin
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> extractTempWithName: tempName withPerform: aSymbol [
 	| refactoring |
-	refactoring := RBExtractToTemporaryRefactoring	
-		extract: node sourceInterval
-		to: tempName
-		from: method selector
-		in: method origin.
+	refactoring := self extractMethodWithName: tempName .
 	
-	"self executeRefactoring: refactoring."
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
 ]
@@ -168,28 +154,22 @@ RBInteractiveLayer >> initializeMethod: aMethod class: aClass interval: anInterv
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineMethod [
-	| refactoring |
-	refactoring := RBInlineMethodRefactoring	
+	^ RBInlineMethodRefactoring	
 		inline: node sourceInterval
 		inMethod: method selector
 		forClass: method origin.
-
-	self executeRefactoring: refactoring.
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineMethodIn: aMethod withClass: aClass for: anInterval [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self inlineMethod.
+	self executeRefactoring: (self inlineMethod)
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineMethodWithPerform: aSymbol [
 	| refactoring |
-	refactoring := RBInlineMethodRefactoring	
-		inline: node sourceInterval
-		inMethod: method selector
-		forClass: method origin.
+	refactoring := self inlineMethod.
 
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
@@ -197,34 +177,26 @@ RBInteractiveLayer >> inlineMethodWithPerform: aSymbol [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineTemp [
-	| assignment refactoring |
+	| assignment |
 	assignment := node methodNode assignmentNodes
 		detect: [ :each | each variable = node ].
-	refactoring := RBInlineTemporaryRefactoring
+	^ RBInlineTemporaryRefactoring
 		inline: assignment sourceInterval
 		from: method selector
-		in: method origin.
-	
-	self executeRefactoring: refactoring.
+		in: method origin
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineTempIn: aMethod withClass: aClass for: anInterval [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self inlineTemp.
+	self executeRefactoring: (self inlineTemp)
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> inlineTempWithPerform: aSymbol [
-	| assignment refactoring |
-	assignment := node methodNode assignmentNodes
-		detect: [ :each | each variable = node ].
-	refactoring := RBInlineTemporaryRefactoring
-		inline: assignment sourceInterval
-		from: method selector
-		in: method origin.
+	| refactoring |
+	refactoring := self inlineTemp.
 	
-	"self executeRefactoring: refactoring."
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
 ]
@@ -261,29 +233,23 @@ RBInteractiveLayer >> node: anObject [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> pushUpMethod [
-	| refactoring |
-	refactoring := RBPullUpMethodRefactoring 
+	^ RBPullUpMethodRefactoring 
 		pullUp: {method selector} 
-		from: method origin.
-
-	self executeRefactoring: refactoring.
+		from: method origin
 	
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> pushUpMethod: aMethod inClass: aClass [
 	self initializeMethod: aMethod class: aClass interval: nil .
-	self pushUpMethod.
+	self executeRefactoring: (self pushUpMethod)
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> pushUpMethodWithPerform: aSymbol [ 
 	| refactoring |
-	refactoring := RBPullUpMethodRefactoring 
-		pullUp: {method selector} 
-		from: method origin.
+	refactoring := self pushUpMethod.
 
-	"self executeRefactoring: refactoring."
 	[refactoring perform: aSymbol.
 	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
 ]
@@ -291,19 +257,25 @@ RBInteractiveLayer >> pushUpMethodWithPerform: aSymbol [
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> renameTempIn: aMethod withClass: aClass for: anInterval withName: aString [
 	self initializeMethod: aMethod class: aClass interval: anInterval .
-	self renameTempWithName: aString.
+	self executeRefactoring: (self renameTempWithName: aString)
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayer >> renameTempWithName: aString [
-	| refactoring |
-	refactoring := RBRenameTemporaryRefactoring	
+	 ^ RBRenameTemporaryRefactoring	
 		renameTemporaryFrom: node sourceInterval
 		to: aString
 		in: method origin
-		selector: method selector.
+		selector: method selector
+]
+
+{ #category : #'as yet unclassified' }
+RBInteractiveLayer >> renameTempWithName: newName withPerform: aSymbol [
+	| refactoring |
+	refactoring := self renameTempWithName: newName.
 	
-	self executeRefactoring: refactoring.
+	[refactoring perform: aSymbol.
+	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
 ]
 
 { #category : #'as yet unclassified' }
