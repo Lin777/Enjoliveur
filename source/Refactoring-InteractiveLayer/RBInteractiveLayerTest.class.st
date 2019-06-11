@@ -9,6 +9,8 @@ Class {
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> createHierarchyTestingClass [
+	"Create a hierarchy classes and methods for execute tests"
+
 	| newClass2|
 	self class compiler 
 		evaluate: 'Object subclass: #RBTestingA
@@ -28,6 +30,8 @@ RBInteractiveLayerTest >> createHierarchyTestingClass [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> createTestingClass [
+	"Create class and methods for execute tests"
+
 	|newClass|
 	newClass := self class compiler 
 		evaluate: 'Object subclass: #RBTestingRefactoring
@@ -62,7 +66,7 @@ RBInteractiveLayerTest >> createTestingClass [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> getTestingClass [
-	^ (Smalltalk globals at: #RBTestingRefactoring)
+	^ self getTestingClass: #RBTestingRefactoring
 ]
 
 { #category : #'as yet unclassified' }
@@ -71,15 +75,19 @@ RBInteractiveLayerTest >> getTestingClass: className [
 ]
 
 { #category : #'as yet unclassified' }
+RBInteractiveLayerTest >> removeClass: aClass [
+	Smalltalk globals removeClassNamed: aClass
+]
+
+{ #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> removeHierarchyClasses [
-	Smalltalk globals removeClassNamed: #RBTestingB.
-	
-	Smalltalk globals removeClassNamed: #RBTestingA.
+	self removeClass: #RBTestingB.
+	self removeClass: #RBTestingA.
 ]
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> removeTestingClass [
-	Smalltalk globals removeClassNamed: #RBTestingRefactoring.
+	self removeClass: #RBTestingRefactoring
 ]
 
 { #category : #'as yet unclassified' }
@@ -98,6 +106,7 @@ RBInteractiveLayerTest >> tearDown [
 
 { #category : #'as yet unclassified' }
 RBInteractiveLayerTest >> testExtractMethod [
+	self flag: 'This test cannot be done because it yet has an interaction with views'
 	"interactiveLayer extractMethodIn: 'example' withClass: (self getTestingClass)
 	 for: (44 to: 49) withName: 'add: a to: b'.
 	
