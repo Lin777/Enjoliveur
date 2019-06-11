@@ -122,7 +122,7 @@ RBInteractiveLayer >> executeThis: refactoring with: aSymbol [
 	"Execute aSymbol refactoring method"
 	
 	[refactoring perform: aSymbol.
-	^ refactoring ] on:RBRefactoringError do: [ :e | ^ e ]
+	^ refactoring ] on:RBRefactoringError do: [ :e | e signal]
 ]
 
 { #category : #'as yet unclassified' }
