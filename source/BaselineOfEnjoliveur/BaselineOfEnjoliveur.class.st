@@ -13,7 +13,7 @@ BaselineOfEnjoliveur >> baseline: spec [
 			self setUpDependencies: spec.
 			spec package: 'RB-Spec';
 			package: 'RB-Spec-Tests';
-			package: 'Refactoring-InteractiveLayer' with: [ spec requires: 'stage' ] ]
+			package: 'Refactoring-InteractiveLayer' with: [ spec requires: 'Stage' ] ]
 ]
 
 { #category : #baselines }
