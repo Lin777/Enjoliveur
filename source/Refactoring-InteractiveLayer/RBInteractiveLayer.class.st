@@ -137,7 +137,7 @@ RBInteractiveLayer >> extractMethod [
 	self setUpOptionToUseExistingMethodDuring: refactoring.
 	self setUpOptionToOverrideExistingMethodDuring: refactoring.
 	refactoring setOption: #methodName toUse:  [ :ref :methodName |
-		dialog := SycMethodNameEditor openOn: methodName.
+		dialog := SycMethodNameEditor3 openOn: methodName withRefactoring: ref.
 		dialog cancelled ifTrue: [  CmdCommandAborted signal ].
 		methodName].
 	^ refactoring
