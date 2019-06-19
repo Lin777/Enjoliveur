@@ -54,8 +54,17 @@ RBGenericInteractLayer >> execute [
 ]
 
 { #category : #'as yet unclassified' }
+RBGenericInteractLayer >> executeInlineMethod [
+	self
+		executeThis: [ refactoring := self inlineMethod.
+			self executeRefactoringWith: #primitiveExecute ]
+]
+
+{ #category : #'as yet unclassified' }
 RBGenericInteractLayer >> executeInlineTemp [
-	self executeThis: [self inlineTempWithPerform: #primitiveExecute]
+	self
+		executeThis: [ refactoring := self inlineTemp.
+			self executeRefactoringWith: #primitiveExecute ]
 ]
 
 { #category : #execution }
@@ -88,6 +97,27 @@ RBGenericInteractLayer >> executionOfRequirements [
 ]
 
 { #category : #'as yet unclassified' }
+RBGenericInteractLayer >> extractTempWithName: newTempName [
+	"Return extract temporary refactoring using method, node and newTempName"
+	
+	^ RBExtractToTemporaryRefactoring	
+		extract: sourceNode sourceInterval
+		to: newTempName
+		from: method selector
+		in: method origin
+]
+
+{ #category : #test }
+RBGenericInteractLayer >> inlineMethod [
+	"Return inline method refactoring using method and node"
+	
+	^ RBInlineMethodRefactoring	
+		inline: sourceNode sourceInterval
+		inMethod: method selector
+		forClass: method origin.
+]
+
+{ #category : #'as yet unclassified' }
 RBGenericInteractLayer >> inlineTemp [
 	"Return inline temporary refactoring using method and node"
 	
@@ -98,15 +128,6 @@ RBGenericInteractLayer >> inlineTemp [
 		inline: assignment sourceInterval
 		from: method selector
 		in: method origin
-]
-
-{ #category : #'as yet unclassified' }
-RBGenericInteractLayer >> inlineTempWithPerform: aSymbol [
-	"Method for use a inline temporary refactoring from a playground, 
-	this run the aSymbol method of refactoring"
-
-	refactoring := self inlineTemp.
-	^ self executeRefactoringWith: aSymbol
 ]
 
 { #category : #accessing }
@@ -127,6 +148,17 @@ RBGenericInteractLayer >> refactoring [
 { #category : #accessing }
 RBGenericInteractLayer >> refactoring: anObject [
 	refactoring := anObject
+]
+
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> renameTempWithName: newTempName [
+	"Return rename temporary refactoring using method, node and newTempName"
+	
+	 ^ RBRenameTemporaryRefactoring	
+		renameTemporaryFrom: sourceNode sourceInterval
+		to: newTempName
+		in: method origin
+		selector: method selector
 ]
 
 { #category : #'as yet unclassified' }

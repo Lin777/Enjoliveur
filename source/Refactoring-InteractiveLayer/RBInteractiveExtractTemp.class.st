@@ -8,6 +8,13 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+RBInteractiveExtractTemp >> executeExtractTemp [
+	self
+		executeThis: [ refactoring := self extractTempWithName: tempName.
+			self executeRefactoringWith: #primitiveExecute ]
+]
+
+{ #category : #'as yet unclassified' }
 RBInteractiveExtractTemp >> executionOfRequirements [
 	tempName := UIManager default 
 		request: 'New temp name' 

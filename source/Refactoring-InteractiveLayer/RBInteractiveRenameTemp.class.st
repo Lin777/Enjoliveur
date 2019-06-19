@@ -8,6 +8,13 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+RBInteractiveRenameTemp >> executeRenameTemp [
+	self
+		executeThis: [ refactoring := self renameTempWithName: newName.
+			self executeRefactoringWith: #primitiveExecute ]
+]
+
+{ #category : #'as yet unclassified' }
 RBInteractiveRenameTemp >> executionOfRequirements [
 	newName := UIManager default 
 		request: 'New name of the variable' 
