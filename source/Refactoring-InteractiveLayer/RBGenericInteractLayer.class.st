@@ -9,6 +9,12 @@ Class {
 	#category : #'Refactoring-InteractiveLayer'
 }
 
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer class >> method: method [
+	^ self new 
+		method: method .
+]
+
 { #category : #initialization }
 RBGenericInteractLayer class >> method: aMethod class: aClass interval: anInterval [
 	"Initialize method and node of this class given:
@@ -42,15 +48,11 @@ RBGenericInteractLayer >> compiledMethodOf: aMethod from: aClass [
 	^ aClass methods at: index
 ]
 
-{ #category : #execution }
-RBGenericInteractLayer >> execute [
-	[
-		self executionOfRequirements.
-		self executeRefactoring.
-		self showChanges 
-	] 
-	on: RBRefactoringError 
-	do: [ :e | UIManager default alert: e messageText ]
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> executeExtractMethod [
+	self
+		executeThis: [ refactoring := self extractMethod.
+			self executeRefactoringWith: #primitiveExecute ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -67,8 +69,11 @@ RBGenericInteractLayer >> executeInlineTemp [
 			self executeRefactoringWith: #primitiveExecute ]
 ]
 
-{ #category : #execution }
-RBGenericInteractLayer >> executeRefactoring [
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> executePushUp [
+	self
+		executeThis: [ refactoring := self pushUpMethod.
+			self executeRefactoringWith: #primitiveExecute ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -94,6 +99,42 @@ RBGenericInteractLayer >> executeThis: aBlock [
 RBGenericInteractLayer >> executionOfRequirements [
 	"If the refactoring needs some requirement like newName or other thing you must
 	 do this here"
+]
+
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> extractMethod [
+	"Return extract method refactoring"
+	
+	| selectedInterval dialog|
+	selectedInterval := sourceNode sourceInterval.
+	
+	refactoring := RBExtractMethodRefactoring	
+		extract: selectedInterval from: method selector in: method origin.
+	self setUpOptionToUseExistingMethodDuring: refactoring.
+	self setUpOptionToOverrideExistingMethodDuring: refactoring.
+	refactoring setOption: #methodName toUse:  [ :ref :methodName |
+		dialog := SycMethodNameEditor3 openOn: methodName withRefactoring: ref.
+		dialog cancelled ifTrue: [  CmdCommandAborted signal ].
+		methodName].
+	^ refactoring
+]
+
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> extractMethodWithName: extractedName [
+	"Return extract method refactoring"
+	
+	| selectedInterval dialog|
+	selectedInterval := sourceNode sourceInterval.
+	
+	refactoring := RBExtractMethodRefactoring	
+		extract: selectedInterval from: method selector in: method origin.
+	self setUpOptionToUseExistingMethodDuring: refactoring.
+	self setUpOptionToOverrideExistingMethodDuring: refactoring.
+	refactoring setOption: #methodName toUse:  [ :ref :methodName |
+		dialog := SycMethodNameEditor3 openOn: methodName withRefactoring: ref.
+		dialog cancelled ifTrue: [  CmdCommandAborted signal ].
+		methodName].
+	^ refactoring
 ]
 
 { #category : #'as yet unclassified' }
@@ -140,6 +181,15 @@ RBGenericInteractLayer >> method: anObject [
 	method := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> pushUpMethod [
+	"Return push up method refactoring using method"
+	
+	^ RBPullUpMethodRefactoring 
+		pullUp: {method selector} 
+		from: method origin
+]
+
 { #category : #accessing }
 RBGenericInteractLayer >> refactoring [
 	^ refactoring
@@ -159,6 +209,36 @@ RBGenericInteractLayer >> renameTempWithName: newTempName [
 		to: newTempName
 		in: method origin
 		selector: method selector
+]
+
+{ #category : #initialization }
+RBGenericInteractLayer >> setUpOptionToOverrideExistingMethodDuring: aRefactoring [
+
+	aRefactoring setOption: #alreadyDefined toUse:  [ :ref :aClass :selector | 
+		ref refactoringWarning: 'Method ', selector printString, ' will override method in ', aClass name]. 
+]
+
+{ #category : #initialization }
+RBGenericInteractLayer >> setUpOptionToUseExistingMethodDuring: aRefactoring [
+
+	aRefactoring setOption: #useExistingMethod toUse:  [ :ref :selector | 
+		UIManager default 
+			confirm: 'Do you want use existing method ', selector printString, '?'
+			label: 'Warninig']. 	
+	
+]
+
+{ #category : #'as yet unclassified' }
+RBGenericInteractLayer >> setupMethodNameFor: aRefactoring toReturn: aSelector [ 
+	| options |
+	options := aRefactoring options copy.
+	options at: #methodName
+		put: 
+			[:ref :aMethodName | 
+			aMethodName
+				selector: aSelector;
+				yourself].
+	aRefactoring options: options
 ]
 
 { #category : #'as yet unclassified' }
